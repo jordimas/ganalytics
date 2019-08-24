@@ -50,7 +50,24 @@ const GAnalytics = class GAnalytics
 
     _update2() {
 
-        log("_update2");
+        buttonText2.set_text("start");
+
+        global.log("_update2");
+
+        let params = {};
+        let _httpSession = new Soup.Session();
+        let url = 'https://www.softcatala.org/catalanitzador/response.php';
+        let message = Soup.form_request_new_from_hash('GET', url, params);
+
+        _httpSession.queue_message(message, Lang.bind(this,
+           function (_httpSession, message) {
+             if (message.status_code !== 200)
+               return;
+
+             let txt = message.response_body.data;
+             buttonText2.set_text("Cat: " + txt);
+           })
+        );
         return true;
     }
 
@@ -88,17 +105,21 @@ const GAnalytics = class GAnalytics
         button.connect('button-press-event', this._showHello);
         Main.panel._rightBox.insert_child_at_index(box, 0);
 
+        this._update1();
+        this._update2();
 
         timer1 = 1000
         timer1id = Mainloop.timeout_add(timer1, Lang.bind(this, this._update1));
-        timer2 = 1000
-        timer2id = Mainloop.timeout_add(timer1, Lang.bind(this, this._update2));
+
+        timer2 = 1000 * 60 * 15
+        timer2id = Mainloop.timeout_add(timer2, Lang.bind(this, this._update2));
 
     }
 
     disable() {
         Main.panel._rightBox.remove_child(box);
         Mainloop.source_remove(timer1id);
+        Mainloop.source_remove(timer2id);
     }
 };
 
