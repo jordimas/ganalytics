@@ -33,7 +33,7 @@ const GAnalytics = class GAnalytics
                          { opacity: 0,
                            time: 2, 
                            transition: 'easeOutQuad',
-                           onComplete: _hideHello });
+                           onComplete: this._hideHello });
 
     }
 
