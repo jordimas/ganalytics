@@ -40,6 +40,16 @@ const GAnalytics = class GAnalytics
     constructor() {
 
         visits = 0;
+    }
+
+    _update() {
+        visits = ++visits;
+        buttonText.set_text(visits.toString());
+        return true;
+    }
+
+    enable() {
+
         buttonText = new St.Label({
                     text: "Loading...",
                     y_align: Clutter.ActorAlign.CENTER
@@ -59,21 +69,11 @@ const GAnalytics = class GAnalytics
         box.add(button);
         box.add(buttonText);
 
-
         button.set_child(icon);
         button.connect('button-press-event', this._showHello);
 
         timer = 1000
         timerid = Mainloop.timeout_add(timer, Lang.bind(this, this._update));
-    }
-
-    _update() {
-        visits = ++visits;
-        buttonText.set_text(visits.toString());
-        return true;
-    }
-
-    enable() {
         Main.panel._rightBox.insert_child_at_index(box, 0);
     }
 
