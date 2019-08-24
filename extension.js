@@ -68,7 +68,7 @@ const GAnalytics = class GAnalytics
     }
 
     _update() {
-        visits = visits++;
+        visits = ++visits;
         buttonText.set_text(visits.toString());
         return true;
     }
