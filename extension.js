@@ -7,7 +7,7 @@ const Mainloop = imports.mainloop;
 const Soup = imports.gi.Soup
 
 
-let text, button, buttonText, buttonText2, box, timer1id, visits, timer1, timer2id, timer2;
+let text, button, box, timer1id, visits, timer2id;
 
 const GAnalytics = class GAnalytics
 {
@@ -44,15 +44,13 @@ const GAnalytics = class GAnalytics
 
     _update1() {
         visits = ++visits;
-        buttonText.set_text(visits.toString());
+        this._buttonText.set_text(visits.toString());
         return true;
     }
 
     _update2() {
 
-        buttonText2.set_text("start");
-
-        global.log("_update2");
+        global.log("Updated catalanitzador stats");
 
         let params = {};
         let _httpSession = new Soup.Session();
@@ -65,7 +63,31 @@ const GAnalytics = class GAnalytics
                return;
 
              let txt = message.response_body.data;
-             buttonText2.set_text("Cat: " + txt);
+             this._buttonText2.set_text("Cat: " + txt);
+           })
+        );
+        return true;
+    }
+
+    _update3() {
+
+        global.log("Updated TM stats");
+
+        let params = {};
+        let _httpSession = new Soup.Session();
+        //let d = new Date(date);
+        //let date = [d.day, d.month, d.year].join('-');
+        let url = 'https://www.softcatala.org/recursos/tm/api/stats?date=2019-08-25';
+        global.log(url);
+        let message = Soup.form_request_new_from_hash('GET', url, params);
+
+        _httpSession.queue_message(message, Lang.bind(this,
+           function (_httpSession, message) {
+             if (message.status_code !== 200)
+               return;
+
+             let txt = message.response_body.data;
+             this._buttonText3.set_text("TM: " + txt);
            })
         );
         return true;
@@ -74,15 +96,21 @@ const GAnalytics = class GAnalytics
 
     enable() {
 
-        buttonText = new St.Label({
+        this._buttonText = new St.Label({
                     style_class: 'label',
                     text: "Button1",
                     y_align: Clutter.ActorAlign.CENTER
                 });
 
-        buttonText2 = new St.Label({
+        this._buttonText2 = new St.Label({
                     style_class: 'label',
                     text: "Button2",
+                    y_align: Clutter.ActorAlign.CENTER
+                });
+
+        this._buttonText3 = new St.Label({
+                    style_class: 'label',
+                    text: "Button3",
                     y_align: Clutter.ActorAlign.CENTER
                 });
 
@@ -98,8 +126,9 @@ const GAnalytics = class GAnalytics
 
         box = new St.BoxLayout({ style_class: 'panel-launcher-box'});
         box.add(button);
-        box.add(buttonText);
-        box.add(buttonText2);
+        box.add(this._buttonText);
+        box.add(this._buttonText2);
+        box.add(this._buttonText3);
 
         button.set_child(icon);
         button.connect('button-press-event', this._showHello);
@@ -107,19 +136,24 @@ const GAnalytics = class GAnalytics
 
         this._update1();
         this._update2();
+        this._update3();
 
-        timer1 = 1000
-        timer1id = Mainloop.timeout_add(timer1, Lang.bind(this, this._update1));
+        let timer1 = 1000
+        this._timer1id = Mainloop.timeout_add(timer1, Lang.bind(this, this._update1));
 
-        timer2 = 1000 * 60 * 15
-        timer2id = Mainloop.timeout_add(timer2, Lang.bind(this, this._update2));
+        let timer2 = 1000 * 60 * 15
+        this._timer2id = Mainloop.timeout_add(timer2, Lang.bind(this, this._update2));
+
+        let timer3 = 1000 * 60 * 15
+        this._timer3id = Mainloop.timeout_add(timer3, Lang.bind(this, this._update3));
 
     }
 
     disable() {
         Main.panel._rightBox.remove_child(box);
-        Mainloop.source_remove(timer1id);
-        Mainloop.source_remove(timer2id);
+        Mainloop.source_remove(this._timer1id);
+        Mainloop.source_remove(this._timer2id);
+        Mainloop.source_remove(this._timer3id);
     }
 };
 
