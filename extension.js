@@ -73,13 +73,17 @@ const GAnalytics = class GAnalytics
 
         global.log("Updated TM stats");
 
+        let today = new Date();
+        let dd = today.getDate();
+        let mm = today.getMonth() + 1;
+        let yyyy = today.getFullYear();
+        let _date = yyyy + '-' + mm + '-' + dd;
+
         let params = {
-            date : "2019-08-25"
+            date : _date
         };
 
         let _httpSession = new Soup.Session();
-        //let d = new Date(date);
-        //let date = [d.day, d.month, d.year].join('-');
         let url = 'https://www.softcatala.org/recursos/tm/api/stats';
         let message = Soup.form_request_new_from_hash('GET', url, params);
 
