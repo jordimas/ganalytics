@@ -73,21 +73,28 @@ const GAnalytics = class GAnalytics
 
         global.log("Updated TM stats");
 
-        let params = {};
+        let params = {
+            date : "2019-08-25"
+        };
+
         let _httpSession = new Soup.Session();
         //let d = new Date(date);
         //let date = [d.day, d.month, d.year].join('-');
-        let url = 'https://www.softcatala.org/recursos/tm/api/stats?date=2019-08-25';
-        global.log(url);
+        let url = 'https://www.softcatala.org/recursos/tm/api/stats';
         let message = Soup.form_request_new_from_hash('GET', url, params);
 
         _httpSession.queue_message(message, Lang.bind(this,
            function (_httpSession, message) {
+             global.log("Request done: " + message.status_code);
+             let txt2 = message.response_body.data;
+             global.log(txt2);
+            
              if (message.status_code !== 200)
                return;
 
-             let txt = message.response_body.data;
-             this._buttonText3.set_text("TM: " + txt);
+             var myRegexp = new RegExp('"searches": "([0-9]*)"');
+             var match = myRegexp.exec(message.response_body.data);
+             this._buttonText3.set_text("TM: " + match[1]);
            })
         );
         return true;
